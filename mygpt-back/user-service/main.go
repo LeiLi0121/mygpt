@@ -2,10 +2,10 @@ package main
 
 import (
 	"log"
-	"mygpt-back/pkg/config"
-	"mygpt-back/pkg/db"
-	"mygpt-back/pkg/logger"
 	"mygpt-back/user-service/internal/handler"
+	"mygpt-back/user-service/pkg/config"
+	"mygpt-back/user-service/pkg/db"
+	"mygpt-back/user-service/pkg/logger"
 	"strconv"
 
 	middleware "mygpt-back/user-service/internal/middleware"

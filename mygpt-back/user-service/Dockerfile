@@ -4,16 +4,16 @@ FROM golang:1.20
 # 设置工作目录
 WORKDIR /app
 
-# 复制整个 mygpt-back 目录
-COPY ../../mygpt-back /app
-
-# 切换到 user-service 子目录
-WORKDIR /app/user-service
+# 复制 go.mod 和 go.sum 文件
+COPY go.mod go.sum ./
 
 # 下载依赖
 RUN go mod download
 
-# 构建项目
+# 复制整个项目文件
+COPY . .
+
+# 构建服务
 RUN go build -o main .
 
 # 设置启动命令

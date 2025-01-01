@@ -2,11 +2,12 @@ version: "3.3"
 services:
   app:
     build:
-      context: ../../mygpt-back
-      dockerfile: ./user-service/Dockerfile
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
-
+    environment:
+      CONFIG_PATH: "/app/config/config.yaml"
     depends_on:
       - mysql
       - redis
