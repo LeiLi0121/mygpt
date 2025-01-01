@@ -1,4 +1,4 @@
-module mygpt-back
+module mygpt-back/user-service
 
 go 1.22.4
 
