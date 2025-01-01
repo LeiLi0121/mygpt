@@ -20,4 +20,4 @@ RUN go build -o main .
 CMD ["./main"]
 
 # 暴露服务端口
-EXPOSE 8080
+EXPOSE 8081

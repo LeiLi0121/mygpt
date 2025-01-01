@@ -5,13 +5,13 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8081:8081"
     environment:
-      CONFIG_PATH: "/app/config/config.yaml"
+      CONFIG_PATH: "/app/config/config_docker.yaml"
     depends_on:
       - mysql
       - redis
-
+g
   mysql:
     image: mysql:8.0
     environment:

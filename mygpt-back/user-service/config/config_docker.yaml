@@ -1,0 +1,16 @@
+server:
+  host: "0.0.0.0"      # 监听地址 (0.0.0.0 表示监听所有网络接口)
+  port: 8081         # 服务端口
+
+mysql:
+  host: "mysql"    # MySQL 主机
+  port: 3306           # MySQL 端口
+  user: "root"         # MySQL 用户名
+  password: "password" # MySQL 密码
+  name: "gpt_user_db"      # MySQL 数据库名称
+
+redis:
+  host: "redis"    # Redis 主机
+  port: 6379           # Redis 端口
+  password: ""         # Redis 密码（为空时无密码）
+  db: 0                # Redis 数据库索引
