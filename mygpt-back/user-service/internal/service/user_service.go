@@ -60,6 +60,10 @@ func (s *UserService) LoginUser(username, password string) (string, error) {
 		return "", errors.New("用户名不存在")
 	}
 
+	if user == nil {
+		return "", errors.New("用户不存在")
+	}
+
 	// 验证密码
 	if !CheckPassword(password, user.Password) {
 		return "", errors.New("密码错误")

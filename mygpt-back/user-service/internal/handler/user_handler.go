@@ -1,9 +1,14 @@
 package handler
 
 import (
+	"bytes"
+	"fmt"
+	"io"
 	"mygpt-back/user-service/internal/model"
 	"mygpt-back/user-service/internal/service"
 	"net/http"
+
+	"mygpt-back/user-service/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,9 +25,15 @@ func NewUserHandler(service *service.UserService) *UserHandler {
 // Register 用户注册
 func (h *UserHandler) Register(c *gin.Context) {
 	var user model.User
+	body, _ := io.ReadAll(c.Request.Body)
+	c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
+
+	fmt.Println("body json is :", body)
+
 	// 解析 JSON 请求
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "请求参数错误"})
+		logger.Log.Error(err.Error())
 		return
 	}
 

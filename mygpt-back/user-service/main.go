@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"mygpt-back/user-service/internal/handler"
+	"mygpt-back/user-service/internal/model"
 	"mygpt-back/user-service/pkg/config"
 	"mygpt-back/user-service/pkg/db"
 	"mygpt-back/user-service/pkg/logger"
@@ -21,13 +22,18 @@ func main() {
 	logger.InitLogger(true) // 如果需要自定义日志，可以实现这个函数
 
 	// 加载配置
-	config := config.Load("config/config.yaml")
+	config := config.Load("config/config_docker.yaml")
 	log.Println("配置文件加载成功")
 
 	// 初始化数据库
 	mysqlDB, err := db.InitMySQL(&config.MySQL)
 	if err != nil {
 		log.Fatalf("MySQL 初始化失败: %v", err)
+	}
+
+	// 自动迁移
+	if err := mysqlDB.AutoMigrate(&model.User{}); err != nil {
+		panic("数据库迁移失败: " + err.Error())
 	}
 	log.Println("MySQL 初始化成功")
 
@@ -47,22 +53,21 @@ func main() {
 	r := gin.Default()
 
 	// 无需验证的路由
-	r.POST("/register", userHandler.Register)
-	r.POST("/login", userHandler.Login)
+	r.POST("/register", userHandler.Register) //需要做格式限制和检查
+	r.POST("/login", userHandler.Login)       //需要做格式限制和检查; 邮箱登录和账号登录的切换;
 
-	// 需要验证的路由
-	auth := r.Group("/auth")
-	auth.Use(middleware.AuthMiddleware(redisClient)) // 使用 Middleware
+	// 需要验证的路由（使用 Group）
+	auth := r.Group("/")
+	auth.Use(middleware.AuthMiddleware(redisClient)) // 添加中间件
 	{
 		auth.GET("/profile", userHandler.GetProfile)
 	}
-
 	// 启动服务器
 	port := config.Server.Port
 	if port == 0 {
 		port = 8080 // 默认端口
 	}
-	portString := ":" + strconv.Itoa(port) // 将端口号转换为字符串
+	portString := config.Server.Host + ":" + strconv.Itoa(port) // 将端口号转换为字符串
 	log.Printf("服务启动中，监听端口 %s...", portString)
 	if err := r.Run(portString); err != nil {
 		log.Fatalf("服务启动失败: %v", err)

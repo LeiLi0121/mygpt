@@ -25,7 +25,13 @@ func (r *UserRepository) CreateUser(user *model.User) error {
 func (r *UserRepository) GetUserByUsername(username string) (*model.User, error) {
 	var user model.User
 	err := r.db.Where("username = ?", username).First(&user).Error
-	return &user, err
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil // 未找到记录，返回 nil
+		}
+		return nil, err // 返回其他数据库错误
+	}
+	return &user, nil // 找到记录
 }
 
 func (r *UserRepository) GetUserByID(id int) (*model.User, error) {
