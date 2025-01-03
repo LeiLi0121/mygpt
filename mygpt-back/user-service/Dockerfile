@@ -1,8 +1,11 @@
 # 使用官方 Golang 镜像
-FROM golang:1.20
+FROM golang:1.22.4
 
 # 设置工作目录
 WORKDIR /app
+
+# 安装 MySQL 客户端
+RUN apt-get update && apt-get install -y mysql-client iputils-ping
 
 # 复制 go.mod 和 go.sum 文件
 COPY go.mod go.sum ./

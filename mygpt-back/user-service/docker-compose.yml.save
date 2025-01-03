@@ -12,12 +12,19 @@ services:
       - mysql
     entrypoint: >
       sh -c "
-      until (echo > /dev/tcp/mysql/3306) >/dev/null 2>&1; do
+      until nc -z mysql 3306; do
         echo 'Waiting for MySQL...';
         sleep 3;
       done;
       ./main"
-      
+      entrypoint: >
+  sh -c "
+  until (echo > /dev/tcp/mysql/3306) >/dev/null 2>&1; do
+    echo 'Waiting for MySQL...';
+    sleep 3;
+  done;
+  ./main"
+
   mysql:
     image: mysql:8.0
     environment:
