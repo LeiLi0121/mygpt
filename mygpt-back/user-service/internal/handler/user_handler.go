@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"mygpt-back/user-service/pkg/logger"
+	"mygpt-back/user-service/pkg/security"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,6 +21,28 @@ type UserHandler struct {
 // NewUserHandler 创建 UserHandler 实例
 func NewUserHandler(service *service.UserService) *UserHandler {
 	return &UserHandler{service: service}
+}
+
+func (h *UserHandler) Validate(c *gin.Context) {
+	// 从 gin.Context 获取 user_id (由 AuthMiddleware 设置)
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"valid": false})
+		return
+	}
+	userIDStr := fmt.Sprintf("%v", userID) // 安全转换为字符串
+
+	encrypted, err := security.EncryptAES(userIDStr) // 加密 user_id
+	if err != nil {
+		fmt.Println("加密失败:", err)
+	} else {
+		fmt.Println("加密后的数据:", encrypted)
+	}
+	// 返回成功响应，表示 Token 有效，并附带 user_id
+	c.JSON(http.StatusOK, gin.H{
+		"valid":   true,
+		"user_id": encrypted,
+	})
 }
 
 // Register 用户注册
@@ -72,7 +95,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 // GetProfile 获取用户信息
 func (h *UserHandler) GetProfile(c *gin.Context) {
 	// 从上下文中获取 userID（需要 Middleware 提供）
-	userID, exists := c.Get("userID")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "用户未登录"})
 		return

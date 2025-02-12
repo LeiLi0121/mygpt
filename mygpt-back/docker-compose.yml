@@ -1,0 +1,48 @@
+version: "3.3"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mygpt-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: gpt_user_db
+      MYSQL_USER: mygpt_user
+      MYSQL_PASSWORD: mygpt_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - /home/leili/goproject/mygpt/mygpt-back/user-service/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: redis:alpine
+    container_name: mygpt-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: mygpt-user-service
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      - CONFIG_PATH=/app/config/config_docker.yaml
+    ports:
+      - "8081:8081"
+
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    container_name: mygpt-gateway-service
+    depends_on:
+      - user-service
+    environment:
+      - CONFIG_ENV=docker
+    ports:
+      - "8080:8080"

@@ -1,0 +1,13 @@
+server:
+  host: "0.0.0.0"    # 监听所有网络接口
+  port: 8080         # Gateway 端口
+
+services:
+  user_service: "http://user-service:8081"  # 通过 Docker 网络访问 user-service
+
+jwt:
+  secret: "your-secret-key"  # JWT 密钥，确保与 user-service 的密钥一致
+  expire: 24h                # Token 过期时间
+
+rate_limit:
+  requests_per_second: 100    # 限制每秒请求数，防止过载

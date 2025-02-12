@@ -1,0 +1,15 @@
+server:
+  host: "0.0.0.0"    # 监听所有网络接口
+  port: 8080
+  timeout: 30s
+
+services:  
+  user_service: "http://localhost:8081"
+  
+
+jwt:
+  secret: "your-secret-key"
+  expire: 24h
+
+rate_limit:
+  requests_per_second: 100

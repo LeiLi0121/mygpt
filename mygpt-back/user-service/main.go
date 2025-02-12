@@ -22,6 +22,7 @@ func main() {
 	logger.InitLogger(true) // 如果需要自定义日志，可以实现这个函数
 
 	// 加载配置
+	// config := config.Load("config/config_local.yaml")
 	config := config.Load("config/config_docker.yaml")
 	log.Println("配置文件加载成功")
 
@@ -53,19 +54,24 @@ func main() {
 	r := gin.Default()
 
 	// 无需验证的路由
-	r.POST("/register", userHandler.Register) //需要做格式限制和检查
-	r.POST("/login", userHandler.Login)       //需要做格式限制和检查; 邮箱登录和账号登录的切换;
-
+	authGroup := r.Group("/api/auth") // authentification api
+	{
+		authGroup.POST("/register", userHandler.Register) //需要做格式限制和检查
+		authGroup.POST("/login", userHandler.Login)       //需要做格式限制和检查; 邮箱登录和账号登录的切换;
+	}
 	// 需要验证的路由（使用 Group）
-	auth := r.Group("/")
+	auth := r.Group("/api")
 	auth.Use(middleware.AuthMiddleware(redisClient)) // 添加中间件
 	{
+		// ✅ **新增: gateway-service 通过这个接口验证 Token**
+		auth.POST("/validate", userHandler.Validate)
+
 		auth.GET("/profile", userHandler.GetProfile)
 	}
 	// 启动服务器
 	port := config.Server.Port
 	if port == 0 {
-		port = 8080 // 默认端口
+		port = 8081 // 默认端口
 	}
 	portString := config.Server.Host + ":" + strconv.Itoa(port) // 将端口号转换为字符串
 	log.Printf("服务启动中，监听端口 %s...", portString)

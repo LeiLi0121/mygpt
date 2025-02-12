@@ -1,0 +1,16 @@
+gateway-service:
+
+
+
+
+user-service: port 8080
+    POST "/api/auth/register": 
+        json：username; password; email
+    POST "/api/auth//login"
+        json：username; password; 
+    
+    AUTH POST "api/profile":
+        http header: Authorization:Bearer <token>
+    AUTH GET "api/validate":
+        http header: Authorization:Bearer <token>
+

@@ -46,7 +46,7 @@ func AuthMiddleware(redisClient *redis.Client) gin.HandlerFunc {
 		}
 
 		// 将 userID 存入上下文
-		c.Set("userID", userID)
+		c.Set("user_id", userID)
 
 		// 执行下一个 Handler
 		c.Next()
